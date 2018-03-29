@@ -1,0 +1,200 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace alphabetCipher
+{
+    class Program
+    {
+        static void iniArr(ref char[,] arr)
+        {
+
+            char ch = 'a';
+
+            for (int i = 0; i < 26; i++)
+            {
+                ch = 'a';
+                if (i != 0)
+                {
+                    for (int a = 1; a < i; a++)
+                    {
+                        ch++;
+                    }
+                }
+
+                for (int j = 0; j < 26; j++)
+                {
+                    if (!(i == 0 && j == 0))
+                    {
+                        ch++;
+                    }
+
+                    arr[i, j] = ch;
+                    if (ch == 'z')
+                    {
+                        ch = 'a';
+                        ch--;
+                    }
+                }
+            }
+        }
+
+        static string inputMsg(int counter, int l)
+        {
+            string str = "";
+            bool correct = false;
+
+            while (!correct)
+            {
+                if (counter == 0)
+                {
+                    Console.WriteLine("Enter the message with only lowercase characters (no spaces).");
+                }
+                else
+                {
+                    Console.WriteLine("\nEnter the cipher (which must not have more characters than your message) with only lowercase characters (no spaces).");
+                }
+
+                str = Console.ReadLine();
+                correct = true;
+
+                if (counter == 1)
+                {
+                    if (str.Length > l)
+                    {
+                        correct = false;
+                    }
+                }
+
+                for (int i = 0; i < str.Length - 1; i++)
+                {
+                    if (!(char.IsLower(str, i)))
+                    {
+                        correct = false;
+                    }
+                }
+
+            }
+            return str;
+        }
+
+        static int inputCho()
+        {
+            int num = 0;
+            bool finished = false;
+
+            while (!finished)
+            {
+                Console.WriteLine("Enter either 1 or 2.");
+                num = Convert.ToInt32(Console.ReadLine());
+
+                if(num == 1 || num == 2)
+                {
+                    finished = true;
+                }
+            }
+
+            return num;
+        }
+
+        static string cipherMatch(int l, string str)
+        {
+            string cipher = "";
+            for (int i = 0; i < l; i++)
+            {
+                cipher = cipher + str[i % str.Length];
+            }
+            return cipher;
+        }
+
+        static string encrypt(char[,] arr, string cipher, string msg)
+        {
+            string encrypted = "";
+
+            for (int i = 0; i < msg.Length; i++)
+            {
+                int xLoc = (int)cipher[i] - 97;
+                int yLoc = (int)msg[i] - 97;
+
+                encrypted = encrypted + arr[xLoc, yLoc];
+            }
+
+            return encrypted;
+        }
+
+        static void e(char[,] arr)
+        {
+            int counter = 0;
+            string msg = inputMsg(counter, 0);
+
+            counter++;
+            string cipherIni = inputMsg(counter, msg.Length);
+
+            string cipher = cipherMatch(msg.Length, cipherIni);
+
+            Console.WriteLine("\n" + cipherIni + " " + msg);
+            Console.WriteLine("-->");
+            Console.WriteLine("Encrypted message: " + encrypt(arr, cipher, msg));
+        }
+
+        static string decrypt(char[,] arr, string cipher, string msg)
+        {
+            string de = "";
+
+            for (int i = 0; i < msg.Length; i++)
+            {
+                int xLoc = (int)cipher[i] - 97;
+                int yLoc = 0;
+
+                for (int c = 0; c < 26; c++)
+                {
+                    if (arr[xLoc, c] == msg[i])
+                    {
+                        yLoc = c;
+                        break;
+                    }
+                }
+
+                de = de + arr[0, yLoc];
+            }
+
+            return de;
+        }
+
+        static void d(char[,] arr)
+        {
+            int counter = 0;
+            string msg = inputMsg(counter, 0);
+
+            counter++;
+            string cipherIni = inputMsg(counter, msg.Length);
+
+            string cipher = cipherMatch(msg.Length, cipherIni);
+
+            Console.WriteLine("\n" + cipherIni + " " + msg);
+            Console.WriteLine("-->");
+            Console.WriteLine("Decrypted message: " + decrypt(arr, cipher, msg));
+        }
+        
+        static void Main(string[] args)
+        {
+            char[,] arr = new char[26, 26];
+            iniArr(ref arr);
+
+            Console.WriteLine("Do you want to encrypt (1) or decrypt (2)?");
+
+            if (inputCho() == 1)
+            {
+                e(arr);
+            }
+            else
+            {
+                d(arr);
+            }
+            
+            Console.ReadKey();
+        }
+    }
+}
